@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
 using TestTask.Data;
 using TestTask.Models;
 
@@ -10,11 +10,12 @@ namespace TestTask.Services.Interfaces.Implementation
         public OrderService (ApplicationDbContext context)
         {
             Context = context;
+
         }
         public Task<Order> GetOrder()
         {
-            Order result = Context.Orders.FirstOrDefault();
-            foreach (var item in Context.Orders)
+            Order result = new();
+            foreach (var item in Context.Orders.Include(o => o.User))
             {
                 result = item.Price < result.Price ? result : item;
             }
@@ -25,7 +26,7 @@ namespace TestTask.Services.Interfaces.Implementation
         {
             List<Order> result = new();
 
-            foreach (var item in Context.Orders)
+            foreach (var item in Context.Orders.Include(o => o.User))
             {
                 if(item.Quantity > 10) result.Add(item);
             }
